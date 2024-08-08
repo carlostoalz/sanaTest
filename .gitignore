@@ -1,0 +1,10 @@
+Backend/.vs
+Backend/SanaTest.API/bin
+Backend/SanaTest.API/obj
+Backend/SanaTest.BE/bin
+Backend/SanaTest.BE/obj
+Backend/SanaTest.Domain/bin
+Backend/SanaTest.Domain/obj
+Backend/SanaTest.Infraestructure/bin
+Backend/SanaTest.Infraestructure/obj
+frontend/node_modules
