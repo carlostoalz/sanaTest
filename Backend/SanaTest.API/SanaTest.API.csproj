@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.9" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SanaTest.BE\SanaTest.BE.csproj" />
+    <ProjectReference Include="..\SanaTest.Domain\SanaTest.Domain.csproj" />
+    <ProjectReference Include="..\SanaTest.Infraestructure\SanaTest.Infraestructure.csproj" />
+  </ItemGroup>
+
+</Project>
