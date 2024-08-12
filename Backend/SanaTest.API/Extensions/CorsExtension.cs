@@ -12,7 +12,7 @@ namespace SanaTest.API
                     policy =>
                     {
                         policy
-                        .WithOrigins(allowedOrigins.Split(";"))
+                        .AllowAnyOrigin()
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                     });

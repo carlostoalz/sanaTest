@@ -132,6 +132,7 @@ BEGIN
 		 [Id] INT NOT NULL PRIMARY KEY IDENTITY
 		,[Id_order] INT NOT NULL FOREIGN KEY REFERENCES [shop].[orders]([Id])
 		,[Id_product] INT NOT NULL FOREIGN KEY REFERENCES [shop].[products]([Id])
+		,[Quantity] INT NOT NULL
 	)
 END
 GO
@@ -158,5 +159,112 @@ BEGIN
 				FOR JSON PATH
 			) AS [Categories]
 	FROM [shop].[products] P
+END
+GO
+
+CREATE OR ALTER PROCEDURE [shop].[SP_Create_Order]
+(
+	@order_info NVARCHAR(MAX)
+)
+AS
+BEGIN
+	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+	SET NOCOUNT ON;
+	DECLARE @IdCustomer INT,
+			@IdOrder INT,
+			@ErrorMessage NVARCHAR(MAX),
+			@ErrorState INT;
+	BEGIN TRY
+		BEGIN TRAN
+			IF NOT EXISTS (
+				SELECT TOP 1 1
+				FROM OPENJSON(@order_info, '$.customer') WITH (
+					 [Id] INT '$.id'
+					,[Code] UNIQUEIDENTIFIER '$.code'
+					,[Name] NVARCHAR(250) '$.name'
+					,[Email] NVARCHAR(250) '$.email'
+				) A
+				INNER JOIN [shop].[customers] B
+					ON A.[Email] = B.[Email]
+			)
+			BEGIN
+				INSERT INTO [shop].[customers]
+				(
+					 [Code]
+					,[Name]
+					,[Email]
+				)
+				SELECT	 [Code]
+						,[Name]
+						,[Email]
+				FROM OPENJSON(@order_info, '$.customer') WITH (
+					 [Id] INT '$.id'
+					,[Code] UNIQUEIDENTIFIER '$.code'
+					,[Name] NVARCHAR(250) '$.name'
+					,[Email] NVARCHAR(250) '$.email'
+				) A
+				SET @IdCustomer = SCOPE_IDENTITY()
+			END
+			ELSE 
+			BEGIN 
+				SELECT TOP 1 @IdCustomer = B.[Id]
+				FROM OPENJSON(@order_info, '$.customer') WITH (
+					 [Id] INT '$.id'
+					,[Code] UNIQUEIDENTIFIER '$.code'
+					,[Name] NVARCHAR(250) '$.name'
+					,[Email] NVARCHAR(250) '$.email'
+				) A
+				INNER JOIN [shop].[customers] B
+					ON A.[Email] = B.[Email]
+			END
+
+			UPDATE A
+				SET A.[Stock] = A.[Stock] - B.[Quantity]
+			FROM [shop].[products] A
+			INNER JOIN OPENJSON(@order_info, '$.orderProducts') WITH (
+				 [Id] INT '$.id'
+				,[Id_product] INT '$.id_product'
+				,[Quantity] INT '$.quantity'
+			) B
+				ON A.[Id] = B.[Id_product]
+
+			INSERT INTO [shop].[orders]
+			(
+				 [Id_customer]
+				,[Total_products]
+				,[Total_price]
+			)
+			SELECT	 @IdCustomer
+					,[Total_products]
+					,[Total_price]
+			FROM OPENJSON(@order_info, '$.order') WITH (
+				 [Total_products] INT  '$.total_products'
+				,[Total_price] DECIMAL '$.total_price'
+			)
+
+			SET @IdOrder = SCOPE_IDENTITY()
+
+			INSERT INTO [shop].[order_products]
+			(
+				 [Id_order]
+				,[Id_product]
+				,[Quantity]
+			)
+			SELECT	 @IdOrder
+					,[Id_product]
+					,[Quantity]
+			FROM OPENJSON(@order_info, '$.orderProducts') WITH (
+				 [Id_product] INT '$.id_product'
+				,[Quantity] INT '$.quantity'
+			)
+		COMMIT TRAN
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+			ROLLBACK TRANSACTION;
+		SET @ErrorMessage = 'Error en el procedimiento [shop].[SP_Create_Order]: ' + ERROR_MESSAGE();
+		SET @ErrorState = ERROR_STATE();
+		THROW 50000, @ErrorMessage, @ErrorState
+	END CATCH
 END
 GO

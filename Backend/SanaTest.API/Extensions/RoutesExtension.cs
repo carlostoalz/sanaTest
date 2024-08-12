@@ -4,7 +4,7 @@
     {
         internal static void UseUserRoutes(this WebApplication app)
         {
-            app.ProductRoutes();
+            app.OrderRoutes();
         }
     }
 }

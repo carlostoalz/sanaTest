@@ -14,12 +14,13 @@ namespace SanaTest.API
 
             #region Domain
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IOrderService, OrderService>();
             #endregion            
 
             #region Infraestructure
-            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IDapperRepository, DapperRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
             #endregion
         }
     }

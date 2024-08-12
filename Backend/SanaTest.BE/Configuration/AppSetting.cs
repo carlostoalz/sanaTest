@@ -12,5 +12,6 @@ namespace SanaTest.BE
     public class Procedures
     {
         public string GetProducts { get; set; }
+        public string CreateOrder { get; set; }
     }
 }
