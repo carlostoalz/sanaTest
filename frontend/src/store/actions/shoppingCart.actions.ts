@@ -1,14 +1,10 @@
-import { ProductDTO } from "../../models/ProductDTO.model";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { OrderDTO } from "../../models/OrderDTO.model";
+import axiosClient from "../../api/client";
 
-export const ADD_TO_CART = "ADD_TO_CART";
-export const REMOVE_FROM_CART = "REMOVE_FROM_CART";
-
-export const addToCart = (product: ProductDTO) => ({
-  type: ADD_TO_CART,
-  payload: product,
-});
-
-export const removeFromCart = (productId: number) => ({
-  type: REMOVE_FROM_CART,
-  payload: productId,
-});
+export const createOrder = createAsyncThunk(
+  "shoppingCar/createOrder",
+  async (order: OrderDTO) => {
+    await axiosClient.post("orders", order);
+  }
+);

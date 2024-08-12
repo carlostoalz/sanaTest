@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DataView } from "primereact/dataview";
-// import { addToCart, removeFromCart } from "../store/cartActions"; // Ejemplo de acciones de Redux
 import {
   getLoading,
   getProducts,
@@ -9,9 +8,9 @@ import {
 import ProductComponent from "./product.component";
 import { ProductDTO } from "../../../models/ProductDTO.model";
 import {
-  addToCart,
-  removeFromCart,
-} from "../../../store/actions/shoppingCart.actions";
+  addToCar,
+  removeFromCar,
+} from "../../../store/reducers/shoppingCart.reducer";
 
 const ListComponent: React.FC = () => {
   const products = useSelector(getProducts);
@@ -23,9 +22,9 @@ const ListComponent: React.FC = () => {
   const handleUpdateQuantity = (product: ProductDTO, newQuantity: number) => {
     setQuantities((prev) => ({ ...prev, [product.id]: newQuantity }));
     if (newQuantity > 0) {
-      dispatch(addToCart({ ...product, quantity: newQuantity }));
+      dispatch(addToCar({ ...product, quantity: newQuantity }));
     } else {
-      dispatch(removeFromCart(product.id));
+      dispatch(removeFromCar(product.id));
     }
   };
 
@@ -49,6 +48,7 @@ const ListComponent: React.FC = () => {
       rows={10}
       loading={loading}
       paginator
+      className="pt-2"
     />
   );
 };

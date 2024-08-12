@@ -1,14 +1,15 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCarItems } from "../../../store/selectors/shoppingCart.selectors";
-import { removeFromCart } from "../../../store/actions/shoppingCart.actions";
+import FormComponent from "../components/form.component";
+import { removeFromCar } from "../../../store/reducers/shoppingCart.reducer";
 
 export const ShoppingCartComponent: React.FC = () => {
   const carItems = useSelector(getCarItems);
   const dispatch = useDispatch();
 
   const handleDelete = (productId: number) => {
-    dispatch(removeFromCart(productId));
+    dispatch(removeFromCar(productId));
   };
 
   const total = carItems
@@ -80,15 +81,8 @@ export const ShoppingCartComponent: React.FC = () => {
             <span>Total</span>
             <span>$ {total * 1.19}</span>
           </div>
-        </div>
-        <div className="row p-3 mt-5 pt-5">
-          <button
-            type="button"
-            className="btn btn-primary text-nowrap d-flex justify-content-center"
-          >
-            Proccess Order
-            <i className="fa-solid fa-chevron-right align-self-center ps-5"></i>
-          </button>
+          <hr className="border-1" />
+          <FormComponent />
         </div>
       </div>
     </div>
